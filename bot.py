@@ -30,7 +30,9 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineQueryResultArticle(
                     id=str(uuid.uuid4()),
                     title=f"{query} = {result}",
-                    input_message_content=InputTextMessageContent(f"{query} = {result}")
+                    input_message_content=InputTextMessageContent(
+                        f"{query} = {result}\n— Caltaw Bot"
+                    )
                 )
             )
         except:
@@ -46,7 +48,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "➤ Type math like:\n"
         "2+2\n50*3\n100/5\n\n"
         "📊 /stats → usage count\n"
-        "🆘 /help → full guide"
+        "🆘 /help → full guide\n\n"
+        "👑 Owner: @mohammadtawhidulalam1"
     )
 
 
@@ -73,11 +76,13 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "💡 Inline Mode:\n"
         "@caltawbot 2+2\n\n"
 
+        "👑 Owner: @mohammadtawhidulalam1\n\n"
+
         "⚙️ Notes:\n"
         "Bot must be admin for protection\n"
         "Works in group & private chat\n\n"
 
-        "🔥 Enjoy!"
+        "🔥 Enjoy using Caltaw Bot!"
     )
 
 
@@ -157,7 +162,9 @@ async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         result = str(eval(text))
         user_usage[user_id] = user_usage.get(user_id, 0) + 1
-        await update.message.reply_text(result)
+        await update.message.reply_text(
+            f"{result}\n\n📊 Uses: {user_usage[user_id]}"
+        )
     except:
         pass
 
