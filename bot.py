@@ -31,6 +31,9 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # AUTO REPLY CALCULATOR
 async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message or not update.message.text:
+        return
+
     text = update.message.text
 
     try:
