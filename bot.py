@@ -18,7 +18,6 @@ user_usage = {}
 # ⚙️ Group settings
 group_settings = {}
 
-
 # ================== INLINE ==================
 async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.inline_query.query
@@ -42,20 +41,54 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================== START ==================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🤖 Bot ready!\nUse /help")
+    await update.message.reply_text(
+        "🤖 Welcome to Caltaw Bot!\n\n"
+        "➤ Type math like:\n"
+        "2+2\n50*3\n100/5\n\n"
+        "📊 /stats → usage count\n"
+        "🆘 /help → full guide"
+    )
 
 
 # ================== HELP ==================
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🆘 Commands:\n\n"
-        "/link on/off → link block\n"
-        "/spam on/off → spam block\n"
-        "/stats → usage\n"
+        "🆘 Caltaw Bot Help Guide\n\n"
+
+        "🧮 Calculator:\n"
+        "➤ Just type math like:\n"
+        "2+2\n50*3\n100/5\n\n"
+
+        "📊 Usage:\n"
+        "➤ /stats → See usage count\n\n"
+
+        "🔗 Link Control (Group only):\n"
+        "➤ /link on → Enable link block\n"
+        "➤ /link off → Disable link block\n\n"
+
+        "🚫 Spam Control (Group only):\n"
+        "➤ /spam on → Enable spam block\n"
+        "➤ /spam off → Disable spam block\n\n"
+
+        "💡 Inline Mode:\n"
+        "@caltawbot 2+2\n\n"
+
+        "⚙️ Notes:\n"
+        "Bot must be admin for protection\n"
+        "Works in group & private chat\n\n"
+
+        "🔥 Enjoy!"
     )
 
 
-# ================== SETTINGS COMMAND ==================
+# ================== STATS ==================
+async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+    count = user_usage.get(user_id, 0)
+    await update.message.reply_text(f"📊 You used bot {count} times")
+
+
+# ================== LINK CONTROL ==================
 async def link_control(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
 
@@ -72,6 +105,7 @@ async def link_control(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Use: /link on or /link off")
 
 
+# ================== SPAM CONTROL ==================
 async def spam_control(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
 
@@ -88,13 +122,6 @@ async def spam_control(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Use: /spam on or /spam off")
 
 
-# ================== STATS ==================
-async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-    count = user_usage.get(user_id, 0)
-    await update.message.reply_text(f"📊 Uses: {count}")
-
-
 # ================== MAIN LOGIC ==================
 async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
@@ -108,7 +135,7 @@ async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat_id not in group_settings:
         group_settings[chat_id] = {"link": False, "spam": False}
 
-    # 🔗 link block
+    # 🔗 Link block
     if group_settings[chat_id]["link"]:
         if "http" in text or "t.me" in text:
             try:
@@ -117,7 +144,7 @@ async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except:
                 pass
 
-    # 🚫 spam block (same message repeat)
+    # 🚫 Spam block (basic)
     if group_settings[chat_id]["spam"]:
         if text.count(text) > 5:
             try:
@@ -126,7 +153,7 @@ async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except:
                 pass
 
-    # 🧮 calculator
+    # 🧮 Calculator
     try:
         result = str(eval(text))
         user_usage[user_id] = user_usage.get(user_id, 0) + 1
