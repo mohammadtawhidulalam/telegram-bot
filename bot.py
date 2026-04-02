@@ -160,7 +160,7 @@ async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 🧮 Calculator
     try:
-        result = str(eval(text))
+        result = f"{eval(text):.2f}"
         user_usage[user_id] = user_usage.get(user_id, 0) + 1
         await update.message.reply_text(
             f"{result}\n\n📊 Uses: {user_usage[user_id]}"
