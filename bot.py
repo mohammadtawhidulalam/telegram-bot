@@ -13,7 +13,7 @@ import os
 TOKEN = os.getenv("BOT_TOKEN")
 
 # =========================
-# FORMAT RESULT (FIX FLOAT ISSUE)
+# FORMAT RESULT (FIX FLOAT)
 # =========================
 def format_result(value):
     if isinstance(value, float):
@@ -24,7 +24,7 @@ def format_result(value):
     return str(value)
 
 # =========================
-# INLINE CALCULATOR
+# INLINE CALCULATOR (2 OPTION + IMAGE)
 # =========================
 async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.inline_query.query
@@ -35,20 +35,36 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
             value = eval(query)
             result = format_result(value)
 
+            # OPTION 1 (clean result)
             results.append(
                 InlineQueryResultArticle(
                     id=str(uuid.uuid4()),
-                    title=f"{query} = {result}",
+                    title=f"{query}",
+                    description=f"{result}",
+                    thumbnail_url="https://cdn-icons-png.flaticon.com/512/992/992651.png",
+                    input_message_content=InputTextMessageContent(
+                        f"{result}"
+                    ),
+                )
+            )
+
+            # OPTION 2 (full text)
+            results.append(
+                InlineQueryResultArticle(
+                    id=str(uuid.uuid4()),
+                    title="Full text",
+                    description=f"{query} = {result}",
+                    thumbnail_url="https://cdn-icons-png.flaticon.com/512/992/992651.png",
                     input_message_content=InputTextMessageContent(
                         f"{query} = {result}"
                     ),
                 )
             )
+
         except:
             pass
 
     await update.inline_query.answer(results, cache_time=1)
-
 
 # =========================
 # START COMMAND
@@ -58,9 +74,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🤖 CalTaw Bot Ready!\n\n"
         "👉 Type math like:\n"
         "2+2, 10*5, 100/4\n\n"
-        "⚡ Inline: @caltawbot 2+2"
+        "⚡ Inline: @caltawbot 2+2\n\n"
+        "👑 Owner: @mohammadtawhidulalam1"
     )
 
+# =========================
+# HELP COMMAND
+# =========================
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "📘 Help Menu\n\n"
+        "🧮 Calculator:\n"
+        "Type any math → 2+2, 10*5\n\n"
+        "⚡ Inline Mode:\n"
+        "@caltawbot 2+2\n\n"
+        "👥 Group:\n"
+        "Auto reply works\n\n"
+        "👑 Owner: @mohammadtawhidulalam1"
+    )
 
 # =========================
 # AUTO REPLY CALCULATOR
@@ -78,7 +109,6 @@ async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except:
         pass
 
-
 # =========================
 # MAIN APP
 # =========================
@@ -86,6 +116,7 @@ app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(InlineQueryHandler(inline_calc))
 app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("help", help_command))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, auto_calc))
 
 app.run_polling()
