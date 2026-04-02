@@ -72,14 +72,18 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🤖 CalTaw Bot Ready!\n\n"
+
         "👉 Type math like:\n"
         "2+2, 10*5, 100/4\n\n"
-        "💡 Inline usage:\n"
-        "<pre>@caltawbot 2+2</pre>\n\n"
-        "👑 Owner: @mohammadtawhidulalam1",
-        parse_mode="HTML"
-    )
 
+        "💡 Inline usage:\n"
+        "`@caltawbot 2+2`\n\n"
+
+        "👆 Tap & hold to copy\n\n"
+
+        "👑 Owner: @mohammadtawhidulalam1",
+        parse_mode="Markdown"
+    )
 # =========================
 # HELP COMMAND
 # =========================
