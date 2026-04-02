@@ -41,7 +41,7 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     id=str(uuid.uuid4()),
                     title=f"{query}",
                     description=f"{result}",
-                    thumbnail_url="https://cdn-icons-png.flaticon.com/512/992/992651.png",
+                    thumbnail_url="https://cdn-icons-png.flaticon.com/512/2921/2921222.png",
                     input_message_content=InputTextMessageContent(
                         f"{result}"
                     ),
@@ -54,7 +54,7 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     id=str(uuid.uuid4()),
                     title="Full text",
                     description=f"{query} = {result}",
-                    thumbnail_url="https://cdn-icons-png.flaticon.com/512/992/992651.png",
+                    thumbnail_url="https://cdn-icons-png.flaticon.com/512/2921/2921222.png",
                     input_message_content=InputTextMessageContent(
                         f"{query} = {result}"
                     ),
