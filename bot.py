@@ -13,14 +13,14 @@ import os
 TOKEN = os.getenv("BOT_TOKEN")
 
 # =========================
-# FORMAT FUNCTION (IMPORTANT FIX)
+# FORMAT RESULT (FIX FLOAT ISSUE)
 # =========================
 def format_result(value):
     if isinstance(value, float):
+        value = round(value, 2)
         if value.is_integer():
             return str(int(value))
-        else:
-            return f"{value:.2f}"
+        return str(value)
     return str(value)
 
 # =========================
@@ -40,7 +40,7 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     id=str(uuid.uuid4()),
                     title=f"{query} = {result}",
                     input_message_content=InputTextMessageContent(
-                        f"{query} = {result}\n— CalTaw Bot"
+                        f"{query} = {result}"
                     ),
                 )
             )
@@ -55,31 +55,10 @@ async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # =========================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 Welcome to CalTaw Bot!\n\n"
-        "👉 Just type math like:\n"
-        "2+2 or 10*5 or 100/4\n\n"
-        "⚡ Works in group & private\n"
-        "💡 Inline: @caltawbot 2+2\n\n"
-        "👑 Owner: @mohammadtawhidulalam1"
-    )
-
-
-# =========================
-# HELP COMMAND
-# =========================
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "📘 Help Menu\n\n"
-        "🧮 Calculator:\n"
-        "Type any math → 2+2, 10*5, 50/2\n\n"
-        "⚡ Inline Mode:\n"
-        "@caltawbot 2+2\n\n"
-        "👥 Group:\n"
-        "Bot auto reply দিব math দেখলে\n\n"
-        "🛠 Features:\n"
-        "✔ Inline Calculator\n"
-        "✔ Auto Reply Calculator\n\n"
-        "👑 Owner: @mohammadtawhidulalam1"
+        "🤖 CalTaw Bot Ready!\n\n"
+        "👉 Type math like:\n"
+        "2+2, 10*5, 100/4\n\n"
+        "⚡ Inline: @caltawbot 2+2"
     )
 
 
@@ -107,7 +86,6 @@ app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(InlineQueryHandler(inline_calc))
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("help", help_command))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, auto_calc))
 
 app.run_polling()
