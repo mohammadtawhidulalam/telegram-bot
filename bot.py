@@ -4,181 +4,110 @@ from telegram.ext import (
     InlineQueryHandler,
     ContextTypes,
     MessageHandler,
-    filters,
     CommandHandler,
+    filters,
 )
 import uuid
 import os
 
 TOKEN = os.getenv("BOT_TOKEN")
 
-# 📊 User tracking
-user_usage = {}
+# =========================
+# FORMAT FUNCTION (IMPORTANT FIX)
+# =========================
+def format_result(value):
+    if isinstance(value, float):
+        if value.is_integer():
+            return str(int(value))
+        else:
+            return f"{value:.2f}"
+    return str(value)
 
-# ⚙️ Group settings
-group_settings = {}
-
-# ================== INLINE ==================
+# =========================
+# INLINE CALCULATOR
+# =========================
 async def inline_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.inline_query.query
     results = []
 
     if query:
         try:
-            result = str(eval(query))
+            value = eval(query)
+            result = format_result(value)
+
             results.append(
                 InlineQueryResultArticle(
                     id=str(uuid.uuid4()),
                     title=f"{query} = {result}",
                     input_message_content=InputTextMessageContent(
-                        f"{query} = {result}\n— Caltaw Bot"
-                    )
+                        f"{query} = {result}\n— CalTaw Bot"
+                    ),
                 )
             )
         except:
             pass
 
-    await update.inline_query.answer(results)
+    await update.inline_query.answer(results, cache_time=1)
 
 
-# ================== START ==================
+# =========================
+# START COMMAND
+# =========================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 Welcome to Caltaw Bot!\n\n"
-        "➤ Type math like:\n"
-        "2+2\n50*3\n100/5\n\n"
-        "📊 /stats → usage count\n"
-        "🆘 /help → full guide\n\n"
+        "🤖 Welcome to CalTaw Bot!\n\n"
+        "👉 Just type math like:\n"
+        "2+2 or 10*5 or 100/4\n\n"
+        "⚡ Works in group & private\n"
+        "💡 Inline: @caltawbot 2+2\n\n"
         "👑 Owner: @mohammadtawhidulalam1"
     )
 
 
-# ================== HELP ==================
+# =========================
+# HELP COMMAND
+# =========================
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🆘 Caltaw Bot Help Guide\n\n"
-
+        "📘 Help Menu\n\n"
         "🧮 Calculator:\n"
-        "➤ Just type math like:\n"
-        "2+2\n50*3\n100/5\n\n"
-
-        "📊 Usage:\n"
-        "➤ /stats → See usage count\n\n"
-
-        "🔗 Link Control (Group only):\n"
-        "➤ /link on → Enable link block\n"
-        "➤ /link off → Disable link block\n\n"
-
-        "🚫 Spam Control (Group only):\n"
-        "➤ /spam on → Enable spam block\n"
-        "➤ /spam off → Disable spam block\n\n"
-
-        "💡 Inline Mode:\n"
+        "Type any math → 2+2, 10*5, 50/2\n\n"
+        "⚡ Inline Mode:\n"
         "@caltawbot 2+2\n\n"
-
-        "👑 Owner: @mohammadtawhidulalam1\n\n"
-
-        "⚙️ Notes:\n"
-        "Bot must be admin for protection\n"
-        "Works in group & private chat\n\n"
-
-        "🔥 Enjoy using Caltaw Bot!"
+        "👥 Group:\n"
+        "Bot auto reply দিব math দেখলে\n\n"
+        "🛠 Features:\n"
+        "✔ Inline Calculator\n"
+        "✔ Auto Reply Calculator\n\n"
+        "👑 Owner: @mohammadtawhidulalam1"
     )
 
 
-# ================== STATS ==================
-async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-    count = user_usage.get(user_id, 0)
-    await update.message.reply_text(f"📊 You used bot {count} times")
-
-
-# ================== LINK CONTROL ==================
-async def link_control(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
-
-    if chat_id not in group_settings:
-        group_settings[chat_id] = {"link": False, "spam": False}
-
-    if context.args and context.args[0] == "on":
-        group_settings[chat_id]["link"] = True
-        await update.message.reply_text("✅ Link block ON")
-    elif context.args and context.args[0] == "off":
-        group_settings[chat_id]["link"] = False
-        await update.message.reply_text("❌ Link block OFF")
-    else:
-        await update.message.reply_text("Use: /link on or /link off")
-
-
-# ================== SPAM CONTROL ==================
-async def spam_control(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.effective_chat.id
-
-    if chat_id not in group_settings:
-        group_settings[chat_id] = {"link": False, "spam": False}
-
-    if context.args and context.args[0] == "on":
-        group_settings[chat_id]["spam"] = True
-        await update.message.reply_text("✅ Spam block ON")
-    elif context.args and context.args[0] == "off":
-        group_settings[chat_id]["spam"] = False
-        await update.message.reply_text("❌ Spam block OFF")
-    else:
-        await update.message.reply_text("Use: /spam on or /spam off")
-
-
-# ================== MAIN LOGIC ==================
+# =========================
+# AUTO REPLY CALCULATOR
+# =========================
 async def auto_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
         return
 
-    text = update.message.text.lower()
-    chat_id = update.effective_chat.id
-    user_id = update.message.from_user.id
+    text = update.message.text
 
-    # default settings
-    if chat_id not in group_settings:
-        group_settings[chat_id] = {"link": False, "spam": False}
-
-    # 🔗 Link block
-    if group_settings[chat_id]["link"]:
-        if "http" in text or "t.me" in text:
-            try:
-                await update.message.delete()
-                return
-            except:
-                pass
-
-    # 🚫 Spam block (basic)
-    if group_settings[chat_id]["spam"]:
-        if text.count(text) > 5:
-            try:
-                await update.message.delete()
-                return
-            except:
-                pass
-
-    # 🧮 Calculator
     try:
-        result = f"{eval(text):.2f}"
-        user_usage[user_id] = user_usage.get(user_id, 0) + 1
-        await update.message.reply_text(
-            f"{result}\n\n📊 Uses: {user_usage[user_id]}"
-        )
+        value = eval(text)
+        result = format_result(value)
+        await update.message.reply_text(result)
     except:
         pass
 
 
-# ================== MAIN ==================
+# =========================
+# MAIN APP
+# =========================
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(InlineQueryHandler(inline_calc))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("help", help_command))
-app.add_handler(CommandHandler("stats", stats))
-app.add_handler(CommandHandler("link", link_control))
-app.add_handler(CommandHandler("spam", spam_control))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, auto_calc))
 
-print("Bot running...")
 app.run_polling()
