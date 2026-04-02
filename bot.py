@@ -74,8 +74,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🤖 CalTaw Bot Ready!\n\n"
         "👉 Type math like:\n"
         "2+2, 10*5, 100/4\n\n"
-        "⚡ Inline: @caltawbot 2+2\n\n"
-        "👑 Owner: @mohammadtawhidulalam1"
+        "💡 Inline usage:\n"
+        "<pre>@caltawbot 2+2</pre>\n\n"
+        "👑 Owner: @mohammadtawhidulalam1",
+        parse_mode="HTML"
     )
 
 # =========================
